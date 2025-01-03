@@ -89,16 +89,16 @@ int main()
 			{
 				current_level.undo();
 			}
-			if (IsKeyPressed(KEY_RIGHT))
-			{
-				if (level_number < n_levels - 1) current_level = levels[++level_number];
-				set_track(current_level.music);	
-			}
-			if (IsKeyPressed(KEY_LEFT))
-			{
-				if (level_number > 0) current_level = levels[--level_number];
-				set_track(current_level.music);	
-			}
+			// if (IsKeyPressed(KEY_RIGHT))
+			// {
+			// 	if (level_number < n_levels - 1) current_level = levels[++level_number];
+			// 	set_track(current_level.music);	
+			// }
+			// if (IsKeyPressed(KEY_LEFT))
+			// {
+			// 	if (level_number > 0) current_level = levels[--level_number];
+			// 	set_track(current_level.music);	
+			// }
 		};
 		
 		if (IsKeyPressed(KEY_SPACE)) current_level.make_move(DIR_NONE);
@@ -146,8 +146,8 @@ int main()
 		case STATE_PLAYING:
 			draw_game();
 			play_game();
-			rend.end_cam();
-			DrawTextEx(rend.font, std::to_string(level_number).c_str(), Vector2{rend.width - 100, 20}, 50, 0, WHITE);
+			// rend.end_cam();
+			// DrawTextEx(rend.font, std::to_string(level_number).c_str(), Vector2{rend.width - 100, 20}, 50, 0, WHITE);
 			game_state = current_level.check_state();
 			if (IsKeyPressed(KEY_ESCAPE)) 
 			{

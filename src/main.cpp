@@ -99,14 +99,13 @@ int main()
 			// 	if (level_number > 0) current_level = levels[--level_number];
 			// 	set_track(current_level.music);	
 			// }
+			if (IsKeyPressed(KEY_SPACE)) current_level.make_move(DIR_NONE);
+			if (IsKeyPressed(KEY_W)) current_level.make_move(DIR_UP);
+			if (IsKeyPressed(KEY_A)) current_level.make_move(DIR_LEFT);
+			if (IsKeyPressed(KEY_S)) current_level.make_move(DIR_DOWN);
+			if (IsKeyPressed(KEY_D)) current_level.make_move(DIR_RIGHT);
 		};
 		
-		if (IsKeyPressed(KEY_SPACE)) current_level.make_move(DIR_NONE);
-		if (IsKeyPressed(KEY_W)) current_level.make_move(DIR_UP);
-		if (IsKeyPressed(KEY_A)) current_level.make_move(DIR_LEFT);
-		if (IsKeyPressed(KEY_S)) current_level.make_move(DIR_DOWN);
-		if (IsKeyPressed(KEY_D)) current_level.make_move(DIR_RIGHT);
-
 		rend.begin();
 
 		switch (game_state)

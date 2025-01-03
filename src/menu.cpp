@@ -97,6 +97,8 @@ struct animation
 
 void draw_menu(renderer& rend)
 {
+	// rend.width = GetScreenWidth();
+	// rend.height = GetScreenWidth();
 	float min_sz = std::min(rend.width, rend.height);
 	float unit = min_sz / 11;
 	float font_sz_large = min_sz / 12;
@@ -177,6 +179,8 @@ void draw_menu(renderer& rend)
 
 	if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 	{
+		msg(MSG_INFO, "--------");
+		msg(MSG_INFO, "window?: %d %d", GetScreenHeight(), GetScreenWidth());
 		Vector2 mouse_pos = GetMousePosition();
 		if (CheckCollisionPointRec(mouse_pos, music_rect))
 		{
@@ -189,6 +193,9 @@ void draw_menu(renderer& rend)
 			msg(MSG_INFO, "Mouse down (button 2) %f %f", mouse_pos.x, mouse_pos.y);
 		}
 		else msg(MSG_INFO, "Mouse down %f %f", mouse_pos.x, mouse_pos.y);
+		msg(MSG_INFO, "music_rect: %f %f %f %f", music_rect.x, music_rect.y, music_rect.w, music_rect.h);
+		msg(MSG_INFO, "sound_rect: %f %f %f %f", sound_rect.x, sound_rect.y, sound_rect.w, sound_rect.h);
+		msg(MSG_INFO, "--------");
 	}
  
 }

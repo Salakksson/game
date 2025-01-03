@@ -10,7 +10,7 @@ renderer::renderer(int x, int y)
     height = y;
 	
     SetTraceLogLevel(LOG_WARNING);
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    // SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     
     SetTargetFPS(0);
 #ifdef DEBUG

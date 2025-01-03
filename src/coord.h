@@ -23,10 +23,18 @@ inline bool operator==(const coord a, const coord b)
 {
 	return a.x == b.x && a.y == b.y;
 }
+inline bool operator!=(const coord a, const coord b)
+{
+	return a.x != b.x || a.y != b.y;
+}
 
 inline coord operator+(const coord a, const coord b)
 {
 	return coord(a.x + b.x, a.y + b.y);
 }
 
+inline coord operator-(const coord a, const coord b)
+{
+	return coord(a.x - b.x, a.y - b.y);
+}
 #endif

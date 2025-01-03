@@ -21,6 +21,7 @@ typedef std::unordered_map<coord, tile, coord_hasher> tile_plane;
 
 enum state
 {
+	STATE_INTRO,
 	STATE_MENU,
 	STATE_LOST,
 	STATE_UNWINNABLE,
@@ -46,6 +47,9 @@ struct map
 	void set_cam(Camera2D& cam);
 	void set_door(uint8_t, bool);
 	void init();
+	bool can_move(coord a, coord mv);
+
+	void sim_conveyors();
 
 	state check_state();
 
@@ -53,6 +57,26 @@ struct map
 	{
 		init();
 	}
+
+	map(const map& other)
+        : grid(other.grid),
+          atlas(other.atlas),
+          anim(other.anim),
+          path(other.path),
+          boundary(other.boundary)
+    {
+    }
+	map& operator=(const map& other)
+    {
+        if (this != &other)
+        {
+            grid = other.grid;
+            anim = other.anim;
+            path = other.path;
+            boundary = other.boundary;
+        }
+        return *this;
+    }
 };
 
 

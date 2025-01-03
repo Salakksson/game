@@ -3,7 +3,7 @@
 
 #include "renderer.h"
 
-void new_function(renderer rend);
-void draw_menu(renderer rend);
+void draw_menu(renderer& rend);
+bool play_intro(renderer& rend);
 
 #endif

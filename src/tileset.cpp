@@ -34,24 +34,53 @@ tileset::tileset()
 	rects[BLOCK_NONE].set(0, rect(0, 0, 0, 0));
 	rects[BLOCK_WALL] = texture(0, 0, 16, 16);
 
-	rects[BLOCK_PAD].set(DOOR_GREEN, rect(128, 0, 16, 16)); 
-	rects[BLOCK_PAD].set(DOOR_BLUE, rect(128, 16, 16, 16)); 
-	rects[BLOCK_PAD].set(DOOR_RED, rect(128, 32, 16, 16)); 
-	rects[BLOCK_PAD].set(DOOR_YELLOW, rect(128, 48, 16, 16)); 
-	
-	rects[BLOCK_DOOR].set(DOOR_GREEN | DOOR_CLOSED, rect(144, 0, 16, 16)); 
-	rects[BLOCK_DOOR].set(DOOR_BLUE | DOOR_CLOSED, rect(144, 16, 16, 16)); 
-	rects[BLOCK_DOOR].set(DOOR_RED | DOOR_CLOSED, rect(144, 32, 16, 16)); 
-	rects[BLOCK_DOOR].set(DOOR_YELLOW | DOOR_CLOSED, rect(144, 48, 16, 16)); 
+	rects[BLOCK_PAD].set(DOOR_GREEN, coord(8, 0)); 
+	rects[BLOCK_PAD].set(DOOR_BLUE, coord(8, 1)); 
+	rects[BLOCK_PAD].set(DOOR_RED, coord(8, 2)); 
+	rects[BLOCK_PAD].set(DOOR_YELLOW, coord(8, 3)); 
 
-	rects[BLOCK_DOOR].set(DOOR_GREEN | DOOR_OPEN, rect(160, 0, 16, 16)); 
-	rects[BLOCK_DOOR].set(DOOR_BLUE | DOOR_OPEN, rect(160, 16, 16, 16)); 
-	rects[BLOCK_DOOR].set(DOOR_RED | DOOR_OPEN, rect(160, 32, 16, 16)); 
-	rects[BLOCK_DOOR].set(DOOR_YELLOW | DOOR_OPEN, rect(160, 48, 16, 16)); 
+	rects[BLOCK_PAD].set(DOOR_GREEN | PAD_INVERSE, coord(9, 0)); 
+	rects[BLOCK_PAD].set(DOOR_BLUE | PAD_INVERSE, coord(9, 1)); 
+	rects[BLOCK_PAD].set(DOOR_RED | PAD_INVERSE, coord(9, 2)); 
+	rects[BLOCK_PAD].set(DOOR_YELLOW | PAD_INVERSE, coord(9, 3)); 
+	
+	rects[BLOCK_DOOR].set(DOOR_GREEN | DOOR_CLOSED, coord(10, 0)); 
+	rects[BLOCK_DOOR].set(DOOR_BLUE | DOOR_CLOSED, coord(10, 1)); 
+	rects[BLOCK_DOOR].set(DOOR_RED | DOOR_CLOSED, coord(10, 2)); 
+	rects[BLOCK_DOOR].set(DOOR_YELLOW | DOOR_CLOSED, coord(10, 3)); 
+
+	rects[BLOCK_DOOR].set(DOOR_GREEN | DOOR_OPEN, coord(11, 0)); 
+	rects[BLOCK_DOOR].set(DOOR_BLUE | DOOR_OPEN, coord(11, 1)); 
+	rects[BLOCK_DOOR].set(DOOR_RED | DOOR_OPEN, coord(11, 2)); 
+	rects[BLOCK_DOOR].set(DOOR_YELLOW | DOOR_OPEN, coord(11, 3));
+
+	rects[BLOCK_CONVEYOR].fps = 5;
+	rects[BLOCK_CONVEYOR].frames = 4;
+
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_RIGHT, coord(4, 4)); 
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_RIGHT + 1, coord(5, 4)); 
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_RIGHT + 2, coord(6, 4)); 
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_RIGHT + 3, coord(7, 4)); 
+
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_LEFT, coord(4, 5)); 
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_LEFT + 1, coord(5, 5)); 
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_LEFT + 2, coord(6, 5)); 
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_LEFT + 3, coord(7, 5)); 
+
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_UP, coord(4, 6)); 
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_UP + 1, coord(5, 6)); 
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_UP + 2, coord(6, 6)); 
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_UP + 3, coord(7, 6)); 
+
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_DOWN, coord(4, 7)); 
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_DOWN + 1, coord(5, 7)); 
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_DOWN + 2, coord(6, 7)); 
+	rects[BLOCK_CONVEYOR].set(CONVEYOR_DOWN + 3, coord(7, 7)); 
 
 	rects[BLOCK_FINISH].set(0, coord(5, 0)); 
 	
 	rects[OBJECT_PARCEL].set(0, coord(4, 0));
+	rects[OBJECT_PARCEL_MINI].set(0, coord(6, 0));
 
 	rects[OBJECT_PLAYER].set(DIR_LEFT, coord(0, 6));
 	rects[OBJECT_PLAYER].set(DIR_DOWN, coord(1, 6));

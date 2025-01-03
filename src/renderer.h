@@ -15,6 +15,7 @@ struct renderer
 	target<float> zoom = 0.16f;
 
     Camera2D cam;
+	Texture2D splash;
     Font font;
 	bool cam_enabled;
 	struct {

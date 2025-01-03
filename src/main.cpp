@@ -7,6 +7,12 @@
 #include "map.h"
 #include "menu.h"
 
+Sound door1;
+Sound door2;
+Sound door3;
+Sound step1;
+Sound step2;
+
 bool g_quit = 0;
 // #define PLATFORM_WEB
 #ifndef PLATFORM_WEB
@@ -16,42 +22,60 @@ int main()
 	
 	msg(MSG_INFO, "info");
 	tileset atlas;
-	map tutorial(ASSETS_DIR"maps/tutorial.map", atlas);	
-	map start(ASSETS_DIR"maps/start.map", atlas);	
-	
-	map levels[] = {
-		tutorial,
-		start,
-	};
-	int level_number = 0;
-	map* current_level = &levels[level_number];
-	current_level->set_cam(rend.cam);
-	// current_level->place(0, 0, tile{BLOCK_NONE, OBJECT_PLAYER, DIR_DOWN, DIR_DOWN});
 	
 	music_init();
+	door1 = LoadSound(ASSETS_DIR"music/door1.wav");
+	door2 = LoadSound(ASSETS_DIR"music/door2.wav");
+	door3 = LoadSound(ASSETS_DIR"music/door3.wav");
+	step1 = LoadSound(ASSETS_DIR"music/step1.wav");
+	step2 = LoadSound(ASSETS_DIR"music/step2.wav");
+
+	map tutorial(ASSETS_DIR"maps/tutorial.map", atlas);	
+	map level_1(ASSETS_DIR"maps/level_1.map", atlas);	
+	map level_2(ASSETS_DIR"maps/level_2.map", atlas);	
+	map level_3(ASSETS_DIR"maps/level_3.map", atlas);	
+	map level_4(ASSETS_DIR"maps/level_4.map", atlas);	
+	map level_5(ASSETS_DIR"maps/level_5.map", atlas);	
+	map level_6(ASSETS_DIR"maps/level_6.map", atlas);	
+	map level_7(ASSETS_DIR"maps/level_7.map", atlas);	
+
+	map levels[] = {
+		tutorial,
+		level_1,
+		level_2,
+		level_3,
+		level_4,
+		level_5,
+		level_6,
+		level_7,
+	};
+	int level_number = 0;
+	map current_level = levels[level_number];
+	current_level.set_cam(rend.cam);
 	
-	state game_state = STATE_PLAYING;
+	state game_state = STATE_INTRO;
 	while(!WindowShouldClose())
 	{
 		music_main_loop();
 		auto draw_game = [&]()
 		{
-			current_level->draw();
+			current_level.draw();
 		};
 		auto play_game = [&]()
 		{
 			if (IsKeyPressed(KEY_R)) 
 			{
 				atlas = tileset();
-				current_level->init();
+				current_level = levels[level_number];
 			}
-			current_level->set_cam(rend.cam);
+			current_level.set_cam(rend.cam);
 			
+			if (IsKeyPressed(KEY_SPACE)) current_level.sim_conveyors();
 			coord mv = {
 				IsKeyPressed(KEY_D) - IsKeyPressed(KEY_A),
 				IsKeyPressed(KEY_S) - IsKeyPressed(KEY_W)
 			};
-			for (auto& [c, t] : current_level->grid)
+			for (auto& [c, t] : current_level.grid)
 			{
 				if (t.object != OBJECT_PLAYER) continue;
 				// msg(MSG_INFO, "found player");
@@ -59,18 +83,15 @@ int main()
 				if (mv.x < 0) t.obj_type = DIR_LEFT;
 				if (mv.y > 0) t.obj_type = DIR_DOWN;
 				if (mv.y < 0) t.obj_type = DIR_UP;
-				if (mv.x | mv.y) current_level->move(c, mv); // must be last
+				if (mv.x | mv.y) 
+				{
+					current_level.move(c, mv);
+					current_level.sim_conveyors();
+				}
 				break;
 			}
 		};
 		
-		auto menu = [&]()
-        {
-            // rend.end_cam();
-            draw_menu(rend);
-            // if (IsKeyPressed(KEY_ESCAPE)) game_state = current_level->check_state();
-        };
-
 		float mouse_x = GetMouseX();
 		float mouse_y = GetMouseY();
 
@@ -78,10 +99,15 @@ int main()
 
 		switch (game_state)
 		{
+		case STATE_INTRO:
+            rend.end_cam();
+			if (play_intro(rend)) game_state = STATE_MENU;
+			break;
 		case STATE_MENU:
 			draw_game();
-			menu();
-			if (IsKeyPressed(KEY_ESCAPE)) game_state = current_level->check_state();
+            rend.end_cam();
+            draw_menu(rend);
+			if (IsKeyPressed(KEY_ESCAPE)) game_state = current_level.check_state();
 			break;
 		case STATE_LOST:
 			draw_game();
@@ -96,8 +122,8 @@ int main()
 		case STATE_PLAYING:
 			draw_game();
 			play_game();
-			game_state = current_level->check_state();
-			if (IsKeyPressed(KEY_P)) 
+			game_state = current_level.check_state();
+			if (IsKeyPressed(KEY_ESCAPE)) 
 			{
 				msg(MSG_INFO, "pressed escape");
 				game_state = STATE_MENU;
@@ -105,9 +131,9 @@ int main()
 			break;
 		case STATE_WON:
 			draw_game();
-			current_level->anim -= GetFrameTime();
-			if (current_level->anim >= 0) break;
-			current_level = &levels[++level_number];
+			current_level.anim -= GetFrameTime();
+			if (current_level.anim >= 0) break;
+			current_level = levels[++level_number];
 			game_state = STATE_PLAYING;
 			break;
 		default: msg(MSG_FATAL, "fix the code!");

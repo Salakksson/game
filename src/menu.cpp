@@ -5,11 +5,6 @@
 #include <stdexcept>
 #include <vector>
 
-namespace std
-{
-		
-}
-
 struct animation
 {
     std::vector<Vector2> points;
@@ -164,7 +159,7 @@ bool play_intro(renderer& rend)
 	opacity.add(7, 1);
 	opacity.add(9, 0);
 
-	img_opacity.add(3, 0);
+	img_opacity.add(2, 0);
 	img_opacity.add(4, 1);
 	img_opacity.add(7, 1);
 	img_opacity.add(9, 0);

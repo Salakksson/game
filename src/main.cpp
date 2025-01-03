@@ -24,20 +24,28 @@ int main()
 	tileset atlas;
 	
 	music_init();
-	door1 = LoadSound(ASSETS_DIR"music/door1.wav");
-	door2 = LoadSound(ASSETS_DIR"music/door2.wav");
-	door3 = LoadSound(ASSETS_DIR"music/door3.wav");
-	step1 = LoadSound(ASSETS_DIR"music/step1.wav");
-	step2 = LoadSound(ASSETS_DIR"music/step2.wav");
+	door1 = LoadSound(MUSIC_DIR"fx/door1.wav");
+	door2 = LoadSound(MUSIC_DIR"fx/door2.wav");
+	door3 = LoadSound(MUSIC_DIR"fx/door3.wav");
+	step1 = LoadSound(MUSIC_DIR"fx/step1.wav");
+	step2 = LoadSound(MUSIC_DIR"fx/step2.wav");
 
 	map tutorial(ASSETS_DIR"maps/tutorial.map", atlas);	
+	tutorial.music = TRACK_1;
 	map level_1(ASSETS_DIR"maps/level_1.map", atlas);	
+	level_1.music = TRACK_1;
 	map level_2(ASSETS_DIR"maps/level_2.map", atlas);	
+	level_2.music = TRACK_2;
 	map level_3(ASSETS_DIR"maps/level_3.map", atlas);	
+	level_3.music = TRACK_2;
 	map level_4(ASSETS_DIR"maps/level_4.map", atlas);	
+	level_4.music = TRACK_3;
 	map level_5(ASSETS_DIR"maps/level_5.map", atlas);	
+	level_5.music = TRACK_3;
 	map level_6(ASSETS_DIR"maps/level_6.map", atlas);	
+	level_6.music = TRACK_3;
 	map level_7(ASSETS_DIR"maps/level_7.map", atlas);	
+	level_7.music = TRACK_3;
 
 	map levels[] = {
 		tutorial,
@@ -51,9 +59,10 @@ int main()
 	};
 	int level_number = 0;
 	map current_level = levels[level_number];
+	set_track(current_level.music);	
 	current_level.set_cam(rend.cam);
 	
-	state game_state = STATE_INTRO;
+	state game_state = STATE_PLAYING;
 	while(!WindowShouldClose())
 	{
 		music_main_loop();
@@ -69,29 +78,14 @@ int main()
 				current_level = levels[level_number];
 			}
 			current_level.set_cam(rend.cam);
-			
-			if (IsKeyPressed(KEY_SPACE)) current_level.sim_conveyors();
-			coord mv = {
-				IsKeyPressed(KEY_D) - IsKeyPressed(KEY_A),
-				IsKeyPressed(KEY_S) - IsKeyPressed(KEY_W)
-			};
-			for (auto& [c, t] : current_level.grid)
-			{
-				if (t.object != OBJECT_PLAYER) continue;
-				// msg(MSG_INFO, "found player");
-				if (mv.x > 0) t.obj_type = DIR_RIGHT;
-				if (mv.x < 0) t.obj_type = DIR_LEFT;
-				if (mv.y > 0) t.obj_type = DIR_DOWN;
-				if (mv.y < 0) t.obj_type = DIR_UP;
-				if (mv.x | mv.y) 
-				{
-					current_level.move(c, mv);
-					current_level.sim_conveyors();
-				}
-				break;
-			}
 		};
 		
+		if (IsKeyPressed(KEY_SPACE)) current_level.make_move(DIR_NONE);
+		if (IsKeyPressed(KEY_W)) current_level.make_move(DIR_UP);
+		if (IsKeyPressed(KEY_A)) current_level.make_move(DIR_LEFT);
+		if (IsKeyPressed(KEY_S)) current_level.make_move(DIR_DOWN);
+		if (IsKeyPressed(KEY_D)) current_level.make_move(DIR_RIGHT);
+
 		float mouse_x = GetMouseX();
 		float mouse_y = GetMouseY();
 
@@ -111,12 +105,12 @@ int main()
 			break;
 		case STATE_LOST:
 			draw_game();
-			msg(MSG_FATAL, "fix the code! lost");
+			msg(MSG_ERROR, "fix the code! lost");
 			if (IsKeyPressed(KEY_ESCAPE)) game_state = STATE_MENU;
 			break;
 		case STATE_UNWINNABLE:
 			draw_game();
-			msg(MSG_FATAL, "fix the code! unwinnable");
+			msg(MSG_ERROR, "fix the code! unwinnable");
 			if (IsKeyPressed(KEY_ESCAPE)) game_state = STATE_MENU;
 			break;
 		case STATE_PLAYING:
@@ -131,9 +125,11 @@ int main()
 			break;
 		case STATE_WON:
 			draw_game();
+			if (current_level.anim == 1) play_effect(FX_WIN);
 			current_level.anim -= GetFrameTime();
 			if (current_level.anim >= 0) break;
 			current_level = levels[++level_number];
+			set_track(current_level.music);	
 			game_state = STATE_PLAYING;
 			break;
 		default: msg(MSG_FATAL, "fix the code!");

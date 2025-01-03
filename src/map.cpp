@@ -16,6 +16,27 @@ inline bool is_object(eblock t)
 {
 	return t > OBJECT_MIN;
 }
+coord get_mv(direction dir)
+{
+	coord mv;
+	switch(dir)
+	{
+		case DIR_LEFT: return coord(-1, 0);
+		case DIR_RIGHT: return coord(1, 0);
+		case DIR_UP: return coord(-0, -1);
+		case DIR_DOWN: return coord(0, 1);
+		case DIR_NONE: return coord(0, 0);
+	};
+}
+direction get_dir(coord mv)
+{
+	if (mv.x > 0) return DIR_RIGHT;
+	if (mv.x < 0) return DIR_LEFT;
+	if (mv.y > 0) return DIR_DOWN;
+	if (mv.y < 0) return DIR_UP;
+	else return DIR_NONE;
+}
+
 tile get_block(char c)
 {
 	eblock value;
@@ -220,7 +241,7 @@ void map::sim_conveyors()
 		{
 			bool open = (grid[m.end].object != OBJECT_NONE && grid[m.end].object != OBJECT_PARCEL_MINI);
 			open ^= (bool)(grid[m.end].block_type & PAD_INVERSE);
-		msg(MSG_INFO, "moving onto pad conveyor: (%d %d): %d %d: %d: xor: %d", (m.end).x, (m.end).y, grid[m.end].block_type, grid[m.end].object, open, (grid[m.end].block_type & PAD_INVERSE));
+		// msg(MSG_INFO, "moving onto pad conveyor: (%d %d): %d %d: %d: xor: %d", (m.end).x, (m.end).y, grid[m.end].block_type, grid[m.end].object, open, (grid[m.end].block_type & PAD_INVERSE));
 			set_door(grid[m.end].block_type, open);
 			if(open) PlaySound(door1);
 		}
@@ -228,25 +249,38 @@ void map::sim_conveyors()
 
 }
 
+bool check_recursion()
+{
+    void *current_return_address = __builtin_return_address(0);
 
+    void *caller_return_address = __builtin_return_address(1);
+
+	return (current_return_address == caller_return_address);
+}
 bool map::move(coord a, coord mv)
 {
-	static bool is_first = false;
 	static Sound& sound = step1;
-	bool play_sound = false;
+
+	bool is_first = check_recursion();
 	if(!is_first) 
 	{
 		sound = (rand() % 2) ? step1 : step2;
-		play_sound = true;
+		PlaySound(sound);
 	}
-	is_first = true;
+
+	if (grid[a].object == OBJECT_PLAYER)
+	{
+		grid[a].obj_type = get_dir(mv);
+	}
 
 	tile block_a = grid[a];
 	tile block_b = grid[a + mv];
+	if(is_solid(block_b)) return false;
 	
-	if(is_solid(block_b)) goto ret_false;
-
-	if(is_pushable(block_b)) if (!move(a + mv, mv)) goto ret_false;
+	if(is_pushable(block_b)) 
+	{	
+		if (!move(a + mv, mv)) return false;
+	}
 	grid[a + mv].object = block_a.object;
 	grid[a + mv].obj_type = block_a.obj_type;
 	grid[a].object = OBJECT_NONE;
@@ -254,7 +288,6 @@ bool map::move(coord a, coord mv)
 	{
 		bool open = (grid[a+mv].object != OBJECT_NONE && grid[a+mv].object != OBJECT_PARCEL_MINI);
 		open ^= (bool)(grid[a + mv].block_type & PAD_INVERSE);
-		msg(MSG_INFO, "moving onto pad: (%d %d): %d %d: %d: xor: %d", (a+mv).x, (a+mv).y, grid[a+mv].block_type, grid[a+mv].object, open, (grid[a + mv].block_type & PAD_INVERSE));
 		set_door(grid[a+mv].block_type, open);
 		if(open) sound = door1;
 	}
@@ -265,35 +298,9 @@ bool map::move(coord a, coord mv)
 		set_door(grid[a].block_type % DOOR_CLOSED, open);
 		if(open) sound = door2;
 	}
-	if (play_sound)
-	{
-		PlaySound(sound);
-		is_first = false;
-	}
 	return true;
-
-ret_false:
-	if (play_sound)
-	{
-		PlaySound(sound);
-		is_first = false;
-	}
-	return false;
-
 }
-bool map::move(coord a, direction dir)
-{
-	coord mv;
-	switch(dir)
-	{
-		case DIR_LEFT: mv = coord(-1, 0); break;
-		case DIR_RIGHT: mv = coord(-1, 0); break;
-		case DIR_UP: mv = coord(-1, 0); break;
-		case DIR_DOWN: mv = coord(-1, 0); break;
-		case DIR_NONE: return false;
-	}
-	return move(a, mv);
-}
+
 
 void map::update()
 {
@@ -364,3 +371,17 @@ state map::check_state()
 		if (n_finish == n_finish_full) return STATE_WON;
 		return STATE_PLAYING;
 }
+
+
+void map::make_move(direction dir)
+{
+	if (dir == DIR_NONE) return sim_conveyors();	
+	for (auto& [c, t] : grid)
+	{
+		if (t.object != OBJECT_PLAYER) continue;
+		move(c, get_mv(dir));
+		sim_conveyors();
+		break;
+	}
+}
+

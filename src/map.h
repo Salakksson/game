@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include "tileset.h"
-
+#include "music.h"
 #include "coord.h"
 
 struct coord_hasher
@@ -31,17 +31,21 @@ enum state
 
 struct map
 {
+	const map* original = nullptr;
 	tile_plane grid;
 	tileset& atlas;
 	
 	float anim = 1.0f;
 	const char* path;
+	track music;	
+	std::vector<direction> moves;
 
 	rect boundary;
 	void place(int x, int y, eblock b);
 	void place(int x, int y, tile t);
 	bool move(coord a, direction dir);
 	bool move(coord a, coord mv);
+	void make_move(direction dir);
 	void draw();
 	void update();
 	void set_cam(Camera2D& cam);
@@ -63,18 +67,20 @@ struct map
           atlas(other.atlas),
           anim(other.anim),
           path(other.path),
-          boundary(other.boundary)
+          boundary(other.boundary),
+		  music(other.music)
     {
+		original = &other;
     }
 	map& operator=(const map& other)
     {
-        if (this != &other)
-        {
-            grid = other.grid;
-            anim = other.anim;
-            path = other.path;
-            boundary = other.boundary;
-        }
+		grid = other.grid;
+		atlas = other.atlas;
+		anim = other.anim;
+		path = other.path;
+		boundary = other.boundary;
+		music = other.music;
+		original = &other;
         return *this;
     }
 };

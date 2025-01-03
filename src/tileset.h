@@ -19,6 +19,7 @@ enum eblock: uint8_t
 	BLOCK_PAD,
 	BLOCK_FINISH,
 	BLOCK_CONVEYOR,
+	BLOCK_CONVEYOR_SAFE,
 	OBJECT_MIN,
 	OBJECT_PARCEL,
 	OBJECT_PARCEL_MINI,
@@ -102,7 +103,6 @@ struct tileset
 	
 	inline void draw(tile block, coord c, float size)
 	{
-		rect src = rects[block.block].get(block.block_type);
 		int frame = rects[block.block].get_frame();
 		if (block.block)
 			DrawTexturePro(tex, 

@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "msg.h"
 #include <cstdio>
 #include <rlgl.h>
 #include <raymath.h>
@@ -76,23 +77,9 @@ void renderer::update()
 
 void renderer::draw_fps()
 {
-    char buffer[20] = {0};
- 	// float fps_width = MeasureTextEx(font, buffer, 50, 0).x;
-    DrawTextEx(font, buffer, Vector2{20, 20}, 50, 0, WHITE);
-	
-	float input_sz = height/8;
-	Vector2 input_pos = {width - 15 - 3 * input_sz, 15};
-
-	// rect inputs(input_pos.x, input_pos.y, input_sz * 3, input_sz * 2);
-	// rect w(input_pos.x + input_sz, input_pos.y, input_sz, input_sz);
-	// rect a(input_pos.x, input_pos.y + input_sz, input_sz, input_sz);
-	// rect s(input_pos.x + input_sz, input_pos.y + input_sz, input_sz, input_sz);
-	// rect d(input_pos.x + 2 * input_sz, input_pos.y + input_sz, input_sz, input_sz);
-	// // DrawRectangleLinesEx(inputs, 2, WHITE);
-	// DrawRectangleLinesEx(w, 2, IsKeyDown(KEY_W) ? RED : WHITE);
-	// DrawRectangleLinesEx(a, 2, IsKeyDown(KEY_A) ? RED : WHITE);
-	// DrawRectangleLinesEx(s, 2, IsKeyDown(KEY_S) ? RED : WHITE);
-	// DrawRectangleLinesEx(d, 2, IsKeyDown(KEY_D) ? RED : WHITE);
+    // char buffer[20] = {0};
+    // sprintf(buffer, "FPS: %d", fps.fps);
+    // DrawTextEx(font, buffer, Vector2{20, 20}, 50, 0, WHITE);
 }
 
 renderer::~renderer()

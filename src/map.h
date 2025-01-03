@@ -27,6 +27,7 @@ enum state
 	STATE_UNWINNABLE,
 	STATE_PLAYING,
 	STATE_WON,
+	STATE_END,
 };
 
 struct map
@@ -52,8 +53,11 @@ struct map
 	void set_door(uint8_t, bool);
 	void init();
 	bool can_move(coord a, coord mv);
+	bool can_conveyor_move(coord pos);
 
 	void sim_conveyors();
+	void reset();
+	void undo();
 
 	state check_state();
 
@@ -67,10 +71,11 @@ struct map
           atlas(other.atlas),
           anim(other.anim),
           path(other.path),
-          boundary(other.boundary),
-		  music(other.music)
+		  music(other.music),
+          boundary(other.boundary)
     {
 		original = &other;
+		moves = std::vector<direction>(30);
     }
 	map& operator=(const map& other)
     {
@@ -81,6 +86,7 @@ struct map
 		boundary = other.boundary;
 		music = other.music;
 		original = &other;
+		moves = std::vector<direction>(30);
         return *this;
     }
 };

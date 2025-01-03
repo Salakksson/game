@@ -9,6 +9,9 @@ emcc src/*.cpp -o web/index.html \
     /h/git/raylib/src/libraylib.web.a \
 	-Os -g\
     --preload-file assets\
+    --preload-file assets/fonts\
+    --preload-file assets/maps\
+    --preload-file assets/music\
 	-D PLATFORM_WEB\
 	-D IsWindowResized=IsWindowResizedWasm
 

@@ -26,6 +26,7 @@ coord get_mv(direction dir)
 		case DIR_UP: return coord(-0, -1);
 		case DIR_DOWN: return coord(0, 1);
 		case DIR_NONE: return coord(0, 0);
+		default: return coord(0, 0);
 	};
 }
 direction get_dir(coord mv)
@@ -70,20 +71,33 @@ tile get_block(char c)
 	return t;
 }
 
-uint8_t get_type(char c)
+tile get_type(tile t, char c)
 {
-	switch(c)
+	switch (t.block)
 	{
-		case 'g': return DOOR_GREEN;
-		case 'b': return DOOR_BLUE;
-		case 'r': return DOOR_RED;
-		case 'y': return DOOR_YELLOW;
-		case 'G': return DOOR_GREEN | PAD_INVERSE;
-		case 'B': return DOOR_BLUE | PAD_INVERSE;
-		case 'R': return DOOR_RED | PAD_INVERSE;
-		case 'Y': return DOOR_YELLOW | PAD_INVERSE;
-		default: return 0;
+		case BLOCK_DOOR:
+		case BLOCK_PAD:
+			switch(c)
+			{
+				case 'g': t.block_type = DOOR_GREEN; break;
+				case 'b': t.block_type = DOOR_BLUE; break;
+				case 'r': t.block_type = DOOR_RED; break;
+				case 'y': t.block_type = DOOR_YELLOW; break;
+				case 'G': t.block_type = DOOR_GREEN | PAD_INVERSE; break;
+				case 'B': t.block_type = DOOR_BLUE | PAD_INVERSE; break;
+				case 'R': t.block_type = DOOR_RED | PAD_INVERSE; break;
+				case 'Y': t.block_type = DOOR_YELLOW | PAD_INVERSE; break;
+				default: break;
+			}
+			break;
+		case BLOCK_CONVEYOR:
+			if (c == 's')
+			{
+				t.block = BLOCK_CONVEYOR_SAFE;
+			}
+		default: break;
 	}
+	return t;
 }
 
 void map::init()
@@ -123,7 +137,7 @@ void map::init()
 					break;
 					default: break;
 				}
-				grid[tile].block_type |= get_type(c);
+				grid[tile] = get_type(grid[tile], c);
 				x++;
 			}
 			subcol = !subcol;	
@@ -135,9 +149,16 @@ void map::init()
 
 	for (auto& [loc, t] : grid)
 	{
-		if (t.object != OBJECT_NONE && (t.obj_type & PAD_INVERSE))
+		if (t.block != BLOCK_PAD) continue;
+		if (t.block_type & PAD_INVERSE)
 		{
-			set_door(t.block_type, true);
+			bool pushed = (t.object != OBJECT_NONE);
+			set_door(t.block_type, !pushed);
+		}
+		else
+		{
+			bool pushed = (t.object != OBJECT_NONE);
+			set_door(t.block_type, pushed);
 		}
 	}
 }
@@ -166,34 +187,60 @@ void map::set_door(uint8_t type, bool open)
 	{
 		if (t.block != BLOCK_DOOR) continue;
 		if (t.block_type % DOOR_CLOSED == color) 
+		{
 			if (open) 
 				t.block_type &= ~DOOR_CLOSED;
 			else 
 				t.block_type |= DOOR_CLOSED;
+		}
 	}
 }
 
-bool map:: can_move(coord a, coord mv)
+bool map::can_move(coord a, coord mv)
 {
 	tile block_b = grid[a + mv];
 	
 	if(is_solid(block_b)) return false;
-
+	if(block_b.block == BLOCK_CONVEYOR_SAFE && grid[a].object == OBJECT_PLAYER) return false;
 	if(is_pushable(block_b)) if (!can_move(a + mv, mv)) return false;
 	return true;
 }
+
+static auto type_to_mv = [](uint8_t type)
+{
+	return 
+		(type == CONVEYOR_RIGHT) ? coord(1, 0):
+		(type == CONVEYOR_LEFT) ? coord(-1, 0):
+		(type == CONVEYOR_UP) ? coord(0, -1):
+		(type == CONVEYOR_DOWN) ? coord(0, 1): 
+								coord(0, 0);
+};
+
+// bool check_recursion()
+// {
+//     void *current_return_address = __builtin_return_address(0);
+//
+//     void *caller_return_address = __builtin_return_address(1);
+//
+// 	return (current_return_address == caller_return_address);
+// }
+
+bool map::can_conveyor_move(coord pos)
+{
+	static std::vector<coord> previous;
+	tile a = grid[pos];
+	coord mv = type_to_mv(a.block_type);
+	tile b = grid[pos + mv];
+	if(is_solid(b)) return false;
+	if(!b.object) return true;
+	if(b.block == BLOCK_CONVEYOR || b.block == BLOCK_CONVEYOR_SAFE) return can_conveyor_move(pos + mv);
+	if(is_pushable(b)) return can_move(pos+mv, mv);
+	
+	return true;
+}
+
 void map::sim_conveyors()
 {
-	auto type_to_mv = [](uint8_t type)
-	{
-		return 
-			(type == CONVEYOR_RIGHT) ? coord(1, 0):
-			(type == CONVEYOR_LEFT) ? coord(-1, 0):
-			(type == CONVEYOR_UP) ? coord(0, -1):
-			(type == CONVEYOR_DOWN) ? coord(0, 1): 
-									coord(0, 0);
-	};
-	
 	struct move
 	{
 		coord start, end;
@@ -204,21 +251,18 @@ void map::sim_conveyors()
 
 	for (const auto& [loc, t] : grid)
 	{
-		if(t.block != BLOCK_CONVEYOR) continue;
+		if(t.block != BLOCK_CONVEYOR && t.block != BLOCK_CONVEYOR_SAFE) continue;
 		if(t.object == OBJECT_NONE) continue;
-	
+		
 		coord mv = type_to_mv(t.block_type);
 		if (mv == coord(0, 0)) FATAL("shits fucked", 0);
-		if (!can_move(loc, mv)) continue;
-		if (is_pushable(grid[loc + mv]))
+		
+		if (can_conveyor_move(loc))
 		{
-			if (can_move(loc + mv, mv))
-			{
-				moves.push_back({loc, loc + mv, t, true});
-			}
+			bool push = (grid[loc + mv].block != BLOCK_CONVEYOR &&
+						 is_pushable(grid[loc + mv]));
+			moves.push_back({loc, loc + mv, t, push});
 		}
-		else
-		moves.push_back({loc, loc + mv, t, false});
 	}
 	for (move m : moves)
 	{
@@ -241,7 +285,6 @@ void map::sim_conveyors()
 		{
 			bool open = (grid[m.end].object != OBJECT_NONE && grid[m.end].object != OBJECT_PARCEL_MINI);
 			open ^= (bool)(grid[m.end].block_type & PAD_INVERSE);
-		// msg(MSG_INFO, "moving onto pad conveyor: (%d %d): %d %d: %d: xor: %d", (m.end).x, (m.end).y, grid[m.end].block_type, grid[m.end].object, open, (grid[m.end].block_type & PAD_INVERSE));
 			set_door(grid[m.end].block_type, open);
 			if(open) PlaySound(door1);
 		}
@@ -249,25 +292,8 @@ void map::sim_conveyors()
 
 }
 
-bool check_recursion()
-{
-    void *current_return_address = __builtin_return_address(0);
-
-    void *caller_return_address = __builtin_return_address(1);
-
-	return (current_return_address == caller_return_address);
-}
 bool map::move(coord a, coord mv)
 {
-	static Sound& sound = step1;
-
-	bool is_first = check_recursion();
-	if(!is_first) 
-	{
-		sound = (rand() % 2) ? step1 : step2;
-		PlaySound(sound);
-	}
-
 	if (grid[a].object == OBJECT_PLAYER)
 	{
 		grid[a].obj_type = get_dir(mv);
@@ -289,14 +315,14 @@ bool map::move(coord a, coord mv)
 		bool open = (grid[a+mv].object != OBJECT_NONE && grid[a+mv].object != OBJECT_PARCEL_MINI);
 		open ^= (bool)(grid[a + mv].block_type & PAD_INVERSE);
 		set_door(grid[a+mv].block_type, open);
-		if(open) sound = door1;
+		queue_sound(&door1);
 	}
 	if (grid[a].block == BLOCK_PAD) 
 	{
 		bool open = (grid[a].object != OBJECT_NONE && grid[a].object != OBJECT_PARCEL_MINI);
 		open ^= (bool)(grid[a].block_type & PAD_INVERSE);
 		set_door(grid[a].block_type % DOOR_CLOSED, open);
-		if(open) sound = door2;
+		queue_sound(&door2);
 	}
 	return true;
 }
@@ -365,23 +391,49 @@ state map::check_state()
 		if (t.object == OBJECT_PLAYER)
 			n_players++;
 	}
-		// msg(MSG_INFO, "p: %d, f: %d, ff: %d, p: %d", n_players, n_finish, n_finish_full, n_parcels);
-		if (n_players < 1) return STATE_UNWINNABLE;
-		if (n_parcels < n_finish) return STATE_UNWINNABLE;
-		if (n_finish == n_finish_full) return STATE_WON;
-		return STATE_PLAYING;
+	if (n_players < 1) return STATE_UNWINNABLE;
+	if (n_parcels < n_finish) return STATE_UNWINNABLE;
+	if (n_finish == n_finish_full) return STATE_WON;
+	return STATE_PLAYING;
 }
 
 
 void map::make_move(direction dir)
 {
+	Sound* sound = (rand() % 2) ? &step1 : &step2;
+	queue_sound(sound);
+
+	moves.push_back(dir);
 	if (dir == DIR_NONE) return sim_conveyors();	
 	for (auto& [c, t] : grid)
 	{
 		if (t.object != OBJECT_PLAYER) continue;
-		move(c, get_mv(dir));
+		if (grid[c + get_mv(dir)].block != BLOCK_CONVEYOR_SAFE)
+			move(c, get_mv(dir));
 		sim_conveyors();
 		break;
+	}
+}
+
+void map::reset()
+{
+	grid = original->grid;
+	atlas = original->atlas;
+	anim = original->anim;
+	path = original->path;
+	boundary = original->boundary;
+	music = original->music;
+	moves.clear();
+}
+
+void map::undo()
+{
+	std::vector<direction> new_moves = moves;
+	new_moves.pop_back();
+	reset();
+	for (direction d : new_moves)
+	{
+		make_move(d);
 	}
 }
 

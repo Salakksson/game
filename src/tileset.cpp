@@ -77,6 +77,29 @@ tileset::tileset()
 	rects[BLOCK_CONVEYOR].set(CONVEYOR_DOWN + 2, coord(6, 7)); 
 	rects[BLOCK_CONVEYOR].set(CONVEYOR_DOWN + 3, coord(7, 7)); 
 
+	rects[BLOCK_CONVEYOR_SAFE].fps = 5;
+	rects[BLOCK_CONVEYOR_SAFE].frames = 4;
+
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_RIGHT, coord(8, 4)); 
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_RIGHT + 1, coord(9, 4)); 
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_RIGHT + 2, coord(10, 4)); 
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_RIGHT + 3, coord(11, 4)); 
+
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_LEFT, coord(8, 5)); 
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_LEFT + 1, coord(9, 5)); 
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_LEFT + 2, coord(10, 5)); 
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_LEFT + 3, coord(11, 5)); 
+
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_UP, coord(8, 6)); 
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_UP + 1, coord(9, 6)); 
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_UP + 2, coord(10, 6)); 
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_UP + 3, coord(11, 6)); 
+
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_DOWN, coord(8, 7)); 
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_DOWN + 1, coord(9, 7)); 
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_DOWN + 2, coord(10, 7)); 
+	rects[BLOCK_CONVEYOR_SAFE].set(CONVEYOR_DOWN + 3, coord(11, 7)); 
+
 	rects[BLOCK_FINISH].set(0, coord(5, 0)); 
 	
 	rects[OBJECT_PARCEL].set(0, coord(4, 0));

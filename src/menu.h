@@ -4,6 +4,7 @@
 #include "renderer.h"
 
 void draw_menu(renderer& rend);
+void draw_menu_end(renderer& rend);
 bool play_intro(renderer& rend);
 
 #endif

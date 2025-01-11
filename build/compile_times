@@ -1,0 +1,6 @@
+build.sh  3.87s user 0.20s system 100% cpu 4.072 total
+
+build.sh  3.35s user 0.23s system 99% cpu 3.586 total
+
+after adding src/std/:
+build.sh  3.61s user 0.41s system 101% cpu 3.952 total

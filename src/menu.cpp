@@ -1,10 +1,9 @@
-#include "menu.h"
-#include "msg.h"
-#include "rect.h"
-#include <algorithm>
-#include <stdexcept>
-#include <vector>
+#include "pch.h"
 #include "music.h"
+#include "menu.h"
+
+#include "std/except.h"
+#include "std/string.h"
 
 struct animation
 {

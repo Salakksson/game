@@ -1,9 +1,9 @@
 #ifndef RENDERER_H_
 #define RENDERER_H_
 
-#include "config.h"
-#include "operators.h"
+#include <raylib.h>
 #include "target.h"
+#include "operators.h"
 
 struct renderer
 {

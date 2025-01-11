@@ -1,11 +1,8 @@
-#include <cmath>
-#define MSG_H_IMPL
-#include "msg.h"
-#include "renderer.h"
+#include "pch.h"
 #include "music.h"
+#include "menu.h"
 #include "tileset.h"
 #include "map.h"
-#include "menu.h"
 
 Sound door1;
 Sound door2;
@@ -23,7 +20,6 @@ bool g_quit = 0;
 int main()
 {
 	renderer rend(800, 600);
-	msg(MSG_INFO, "info");
 	tileset atlas;
 	
 	music_init();
@@ -89,16 +85,16 @@ int main()
 			{
 				current_level.undo();
 			}
-			// if (IsKeyPressed(KEY_RIGHT))
-			// {
-			// 	if (level_number < n_levels - 1) current_level = levels[++level_number];
-			// 	set_track(current_level.music);	
-			// }
-			// if (IsKeyPressed(KEY_LEFT))
-			// {
-			// 	if (level_number > 0) current_level = levels[--level_number];
-			// 	set_track(current_level.music);	
-			// }
+			if (IsKeyPressed(KEY_RIGHT))
+			{
+				if (level_number < n_levels - 1) current_level = levels[++level_number];
+				set_track(current_level.music);	
+			}
+			if (IsKeyPressed(KEY_LEFT))
+			{
+				if (level_number > 0) current_level = levels[--level_number];
+				set_track(current_level.music);	
+			}
 			if (IsKeyPressed(KEY_SPACE)) current_level.make_move(DIR_NONE);
 			if (IsKeyPressed(KEY_W)) current_level.make_move(DIR_UP);
 			if (IsKeyPressed(KEY_A)) current_level.make_move(DIR_LEFT);
@@ -145,8 +141,8 @@ int main()
 		case STATE_PLAYING:
 			draw_game();
 			play_game();
-			// rend.end_cam();
-			// DrawTextEx(rend.font, std::to_string(level_number).c_str(), Vector2{rend.width - 100, 20}, 50, 0, WHITE);
+			rend.end_cam();
+			DrawTextEx(rend.font, std::to_string(level_number).c_str(), Vector2{rend.width - 100, 20}, 50, 0, WHITE);
 			game_state = current_level.check_state();
 			if (IsKeyPressed(KEY_ESCAPE)) 
 			{
@@ -159,9 +155,12 @@ int main()
 			if (current_level.anim == 1) play_effect(FX_WIN);
 			current_level.anim -= GetFrameTime();
 			if (current_level.anim >= 0) break;
-			set_track(current_level.music);	
 			game_state = STATE_PLAYING;
-			if (level_number < n_levels - 1) current_level = levels[++level_number];
+			if (level_number < n_levels - 1) 
+			{
+				current_level = levels[++level_number];
+				set_track(current_level.music);	
+			}
 			else game_state = STATE_END;
 			break;
 		default: msg(MSG_FATAL, "fix the code!");

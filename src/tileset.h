@@ -1,14 +1,12 @@
 #ifndef TILESET_H_
 #define TILESET_H_
 
-#include "coord.h"
-#include "msg.h"
-#include "rect.h"
-#include <cstdint>
-#include <optional>
-#include <stdexcept>
-#include <unordered_map>
 #include <raylib.h>
+#include "std/except.h"
+#include "std/unordered_map.h"
+#include <cstdint>
+#include "coord.h"
+#include "rect.h"
 
 enum eblock: uint8_t
 {

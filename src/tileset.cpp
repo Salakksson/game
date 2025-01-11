@@ -25,7 +25,7 @@ texture::texture(int x, int y, int width, int height)
 
 tileset::tileset()
 {
-	Image img = LoadImage(ASSETS_DIR"atlas.png");
+	Image img = LoadImage("assets/atlas.png");
 	if (!img.data) msg(MSG_FATAL, "Failed to load image");
 
 	tex = LoadTextureFromImage(img);

@@ -1,6 +1,4 @@
-#include "renderer.h"
-#include "msg.h"
-#include <cstdio>
+#include "pch.h"
 #include <rlgl.h>
 #include <raymath.h>
 

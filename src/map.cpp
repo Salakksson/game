@@ -1,10 +1,6 @@
+#include "pch.h"
 #include "map.h"
-
-#include "rect.h"
-#include "msg.h"
-
-#include <cmath>
-#include <fstream>
+#include "std/fstream.h"
 
 extern Sound door1;
 extern Sound door2;

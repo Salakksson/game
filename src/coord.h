@@ -1,12 +1,12 @@
 #ifndef COORD_H_
 #define COORD_H_
 
-#include <cstddef>
+#include <cstdint>
 #include <raylib.h>
 
 struct coord
 {
-	int x, y;
+	int16_t x, y;
 	inline coord(int x, int y): x(x), y(y) {}
 	inline coord(): x(0), y(0) {}
 	inline explicit coord(Vector2 v): x(v.x), y(v.y) {}

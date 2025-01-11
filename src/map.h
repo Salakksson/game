@@ -1,8 +1,7 @@
 #ifndef MAP_H_
 #define MAP_H_
 
-#include <unordered_map>
-#include <vector>
+#include "std/vector.h"
 #include "tileset.h"
 #include "music.h"
 #include "coord.h"
